@@ -316,7 +316,6 @@ void GridSlamProcessor::setMotionModelParameters
   bool GridSlamProcessor::processScan(const RangeReading & reading, int adaptParticles){
     
     /**retireve the position from the reading, and compute the odometry*/
-    //relPose 当前时刻位姿(z,y,theta), m_odoPose 上一时刻位姿
     OrientedPoint relPose=reading.getPose();
     if (!m_count){
       m_lastPartPose=m_odoPose=relPose;
@@ -353,7 +352,7 @@ void GridSlamProcessor::setMotionModelParameters
     onOdometryUpdate();
     
 
-    // accumulate the robot translation and rotation  //计算位移和旋转增量
+    // accumulate the robot translation and rotation
     OrientedPoint move=relPose-m_odoPose;
     move.theta=atan2(sin(move.theta), cos(move.theta));
     m_linearDistance+=sqrt(move*move);
@@ -417,7 +416,7 @@ void GridSlamProcessor::setMotionModelParameters
                                reading.getTime());
 
       if (m_count>0){
-	scanMatch(plainReading);  //扫描匹配
+	scanMatch(plainReading);
 	if (m_outputStream.is_open()){
 	  m_outputStream << "LASER_READING "<< reading.size() << " ";
 	  m_outputStream << setiosflags(ios::fixed) << setprecision(2);
@@ -436,7 +435,7 @@ void GridSlamProcessor::setMotionModelParameters
 	  m_outputStream << endl;
 	}
 	onScanmatchUpdate();
-	//权重更新
+	
 	updateTreeWeights(false);
 				
 	if (m_infoStream){
@@ -446,7 +445,6 @@ void GridSlamProcessor::setMotionModelParameters
 	  m_outputStream << setiosflags(ios::fixed) << setprecision(6);
 	  m_outputStream << "NEFF " << m_neff << endl;
 	}
-  // 重采样
  	resample(plainReading, adaptParticles, reading_copy);
 	
       } else {

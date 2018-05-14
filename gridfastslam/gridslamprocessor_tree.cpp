@@ -198,10 +198,10 @@ void GridSlamProcessor::integrateScanSequence(GridSlamProcessor::TNode* node){
 void  GridSlamProcessor::updateTreeWeights(bool weightsAlreadyNormalized){
 
   if (!weightsAlreadyNormalized) {
-    normalize();
+    normalize();   //Neff 计算（论文公式20）
   }
-  resetTree();
-  propagateWeights();
+  resetTree();  	//初始化粒子的树节点 权重，访问次数，父节点
+  propagateWeights(); 	// 位迭代计算，计算上一次的该粒子权重 （论文公式19）
 }
 
 void GridSlamProcessor::resetTree(){

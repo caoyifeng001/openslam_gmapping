@@ -6,16 +6,31 @@
 
 /**Just scan match every single particle.
 If the scan matching fails, the particle gets a default likelihood.*/
+/*通过扫描匹配选取最优的粒子，如果匹配失败返回一个默认的似然估计
+《Probabilistic Robot》 P143 likeihood_field_range_finder_mode
+*/
+
 inline void GridSlamProcessor::scanMatch(const double* plainReading){
   // sample a new pose from each scan in the reference
   
   double sumScore=0;
-  for (ParticleVector::iterator it=m_particles.begin(); it!=m_particles.end(); it++){
+  for (ParticleVector::iterator it=m_particles.begin(); it!=m_particles.end(); it++){   //对每个粒子迭代
     OrientedPoint corrected;
     double score, l, s;
+
+    /* 计算最优的粒子
+optimize 调用了 score 这个函数 （计算粒子得分）
+在score 函数里，首先计算障碍物的坐标phit，然后将phit转换成网格坐标iPhit
+计算光束上与障碍物相邻的非障碍物网格坐标pfree,pfrree由phit沿激光束方向移动一个网格的距离得到，将pfree转换成网格坐标ipfree（增量，并不是实际值）
+在iphit 及其附近8个（m_kernelSize:default=1）栅格（pr,对应自由栅格为pf）搜索最优可能是障碍物的栅格。
+最优准则： pr 大于某一阈值，pf小于该阈值，且pr栅格的phit的平均坐标与phit的距离bestMu最小。
+得分计算： s +=exp(-1.0/m_gaussianSigma*bestMu*besMu)  参考NDT算法,距离越大，分数越小，分数的较大值集中在距离最小值处，符合正态分布模型
+至此 score 函数结束并返回粒子（currentPose）得分，然后回到optimize函数
+optimize 干的事就是 currentPose 的位姿进行微调，前、后、左、右、左转、右转 共6次，然后选取得分最高的位姿，返回最终的得分
+*/
     score=m_matcher.optimize(corrected, it->map, it->pose, plainReading);
     //    it->pose=corrected;
-    if (score>m_minimumScore){
+    if (score>m_minimumScore){  //判断得分是否符合要求
       it->pose=corrected;
     } else {
 	if (m_infoStream){
@@ -24,14 +39,20 @@ inline void GridSlamProcessor::scanMatch(const double* plainReading){
 	  m_infoStream << "op:" << m_odoPose.x << " " << m_odoPose.y << " "<< m_odoPose.theta <<std::endl;
 	}
     }
-
+    // likelihoodAndScore 作用是计算粒子的权重和（1），如果出现匹配失败则 l=noHit  
     m_matcher.likelihoodAndScore(s, l, it->map, it->pose, plainReading);
     sumScore+=score;
     it->weight+=l;
     it->weightSum+=l;
 
-    //set up the selective copy of the active area
+    //set up the selective copy of the active area  //计算可活动区域
     //by detaching the areas that will be updated
+    /*
+    computeActiveArea 用于计算每个粒子相应的位姿所扫描到的区域  
+    计算过程首先考虑了每个粒子的扫描范围会不会超过子地图的大小，如果会，则resize地图的大小
+    然后定义了一个activeArea 用于设置可活动区域，调用了gridLine() 函数,这个函数如何实现的，
+    请参考百度文库那篇介绍。
+    */
     m_matcher.invalidateActiveArea();
     m_matcher.computeActiveArea(it->map, it->pose, plainReading);
   }
@@ -66,7 +87,13 @@ inline void GridSlamProcessor::normalize(){
   m_neff=1./m_neff;
   
 }
-
+/*
+粒子集对目标分布的近似越差，则权重的方差越大，可用Neff来度量，具体原理参见论文，以及白巧克力亦唯心的那篇博客
+代码太长了就不粘贴了
+重采样里还调用了registerScan ，这个函数和computeActive 函数有点像，不同的是，registerScan用于注册每个单元格
+的状态，自由、障碍，调用update()以及entroy()函数更新，最后是障碍物的概率 p=n/visits ,
+障碍物的坐标用平均值来算完了后，又有一次权重计算。
+*/
 inline bool GridSlamProcessor::resample(const double* plainReading, int adaptSize, const RangeReading* reading){
   
   bool hasResampled = false;
