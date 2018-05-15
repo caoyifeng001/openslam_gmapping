@@ -113,6 +113,9 @@ void ScanMatcher::computeActiveArea(ScanMatcherMap& map, const OrientedPoint& p,
 	m_activeAreaComputed=true;
 }
 */
+/*
+ 	计算激光在每个粒子相应的位姿所扫描到的区域
+*/
 void ScanMatcher::computeActiveArea(ScanMatcherMap& map, const OrientedPoint& p, const double* readings){
 	if (m_activeAreaComputed)
 		return;

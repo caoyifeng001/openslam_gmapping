@@ -264,7 +264,12 @@ void GridSlamProcessor::setMotionModelParameters
     m_matcher.setLaserParameters(m_beams, angles, rangeSensor->getPose());
     delete [] angles;
   }
-  
+  /*
+  如果是第一个激光数据，粒子初始化，每个粒子维护一幅地图map，机器人位姿pose，上一个时刻位姿previousPose，权重
+  weight，权重和 weightSum
+  地图信息包括
+  m_center : 
+  */
   void GridSlamProcessor::init(unsigned int size, double xmin, double ymin, double xmax, double ymax, double delta, OrientedPoint initialPose){
     m_xmin=xmin;
     m_ymin=ymin;

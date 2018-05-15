@@ -23,7 +23,7 @@ MotionModel::drawFromMotion (const OrientedPoint& p, double linearMove, double a
 
 
 // 更新t时刻粒子群 （模型中加了高斯噪声）
-//《Probabilistic Robot》P107 里程计模型relPose 当前时刻位姿(z,y,theta), m_odoPose上一时刻位姿
+//《Probabilistic Robot》P107 里程计模型 
 OrientedPoint 
 MotionModel::drawFromMotion(const OrientedPoint& p, const OrientedPoint& pnew, const OrientedPoint& pold) const{
 	double sxy=0.3*srr;   //目测是两个轮子耦合方差，

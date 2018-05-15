@@ -89,7 +89,6 @@ inline void GridSlamProcessor::normalize(){
 }
 /*
 粒子集对目标分布的近似越差，则权重的方差越大，可用Neff来度量，具体原理参见论文，以及白巧克力亦唯心的那篇博客
-代码太长了就不粘贴了
 重采样里还调用了registerScan ，这个函数和computeActive 函数有点像，不同的是，registerScan用于注册每个单元格
 的状态，自由、障碍，调用update()以及entroy()函数更新，最后是障碍物的概率 p=n/visits ,
 障碍物的坐标用平均值来算完了后，又有一次权重计算。
