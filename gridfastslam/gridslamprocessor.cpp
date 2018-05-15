@@ -27,7 +27,7 @@ using namespace std;
   
   GridSlamProcessor::GridSlamProcessor(const GridSlamProcessor& gsp) 
     :last_update_time_(0.0), m_particles(gsp.m_particles), m_infoStream(cout){
-    
+   
     period_ = 5.0;
 
     m_obsSigmaGain=gsp.m_obsSigmaGain;
@@ -92,7 +92,7 @@ using namespace std;
     m_obsSigmaGain=1;
     m_resampleThreshold=0.5;
     m_minimumScore=0.;
-	
+	 
   }
 
   GridSlamProcessor* GridSlamProcessor::clone() const {
