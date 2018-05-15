@@ -8,7 +8,7 @@
 namespace GMapping {
 
 
-
+//参数 输入位姿 线速度 角速度  2-4行是运动学模型的误差参数，5-7行产生新的位姿
 OrientedPoint 
 MotionModel::drawFromMotion (const OrientedPoint& p, double linearMove, double angularMove) const{
 	OrientedPoint n(p);
@@ -24,6 +24,7 @@ MotionModel::drawFromMotion (const OrientedPoint& p, double linearMove, double a
 
 // 更新t时刻粒子群 （模型中加了高斯噪声）
 //《Probabilistic Robot》P107 里程计模型 
+
 OrientedPoint 
 MotionModel::drawFromMotion(const OrientedPoint& p, const OrientedPoint& pnew, const OrientedPoint& pold) const{
 	double sxy=0.3*srr;   //目测是两个轮子耦合方差，

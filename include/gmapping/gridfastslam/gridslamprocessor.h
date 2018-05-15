@@ -41,7 +41,7 @@ namespace GMapping {
    */
     struct TNode{
       /**Constructs a node of the trajectory tree.
-       @param pose:      the pose of the robot in the trajectory
+       @param pose:      the pose of the robot in the trajectory  机器人轨迹的位姿
        @param weight:    the weight of the particle at that point in the trajectory
        @param accWeight: the cumulative weight of the particle
        @param parent:    the parent node in the tree
